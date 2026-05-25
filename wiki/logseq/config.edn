@@ -1,0 +1,18 @@
+;; Logseq config for a research wiki built from this template.
+;; Plain-markdown pages so the graph stays readable without Logseq.
+
+{:meta/version 1
+ :preferred-format :markdown
+ :preferred-workflow :now
+ :feature/enable-block-timestamps? true
+ :feature/enable-journals? true
+ :journal/page-title-format "yyyy-MM-dd"
+ :journals-directory "journals"
+ :pages-directory "pages"
+ :default-templates {:journals ""}
+ :ignored-page-references-keywords #{}
+ :property-pages/enabled? true
+ :graph/settings {:journal? true
+                  :orphan-pages? true
+                  :builtin-pages? false}
+ :commands []}

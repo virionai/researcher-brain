@@ -1,0 +1,214 @@
+# domain.md.example
+
+This file shows what `R0: init` produces. It's a reference, not a
+live config — the real one is written to `domain.md` at the project
+root after the operator runs the init interview.
+
+The schema below is annotated. Three short worked examples follow,
+showing how the same fields adapt across very different topics.
+
+---
+
+## Schema
+
+```yaml
+# What the operator is researching, in their own words.
+topic: "One or two sentences. Field of inquiry where reasonable
+        people would disagree about sub-fields."
+
+# 2–5 kinds of things this topic studies. Used as wiki page-type
+# values and tag families.
+concept_categories:
+  - "category-name"      # lowercase, kebab-case
+  - "category-name"
+
+# 3–8 sub-fields, specialties, or schools that cut across the topic.
+# These become the domain tags R2 uses to find bridges.
+subfields:
+  - "subfield-name"
+  - "subfield-name"
+
+# 2–5 primary-source databases / archives / repositories the agent
+# should look in first when searching for evidence.
+primary_sources:
+  - name: "Source name"
+    url_pattern: "https://…"
+    identifier_scheme: "doi"     # doi | pmid | arxiv | isbn | rfc |
+                                 # case-docket | url-hash | …
+
+# Whether R2 (cross-domain probe) is enabled. Set true when the topic
+# pays off on connections between sub-fields; false for deep single-
+# discipline dives.
+cross_domain: true
+
+# Optional. Seed question to kick off the first R1 or R5 after init.
+seed_question: "The first thing the operator wants to look at."
+
+# Optional. Identifier-scheme preference order for source slugs,
+# overriding the default DOI > PMID > arXiv > ISBN > url-hash.
+identifier_priority:
+  - doi
+  - pmid
+  - arxiv
+  - isbn
+  - url-hash
+
+# Optional. Source-type taxonomy specific to this topic. Helps R3
+# fill in meta.yaml → source_type consistently.
+source_types:
+  - "RCT"
+  - "cohort study"
+  - "review"
+  - "book"
+  - "court opinion"
+  # …whatever the operator's field uses
+```
+
+---
+
+## Example 1 — Cross-domain medical research
+
+```yaml
+topic: "Cross-domain effects of supplements, drugs, behaviors, and
+        diet on organ systems and conditions. Particular interest in
+        findings that bridge specialties (e.g., gut↔brain)."
+
+concept_categories:
+  - intervention       # supplements, drugs, foods, behaviors
+  - organ-system       # gut, brain, heart, skin, immune, …
+  - condition          # IBS, eczema, depression, migraine, …
+
+subfields:
+  - gastroenterology
+  - psychiatry
+  - dermatology
+  - endocrinology
+  - immunology
+  - sleep-medicine
+  - sports-medicine
+
+primary_sources:
+  - name: PubMed
+    url_pattern: "https://pubmed.ncbi.nlm.nih.gov/?term=…"
+    identifier_scheme: pmid
+  - name: Cochrane
+    url_pattern: "https://www.cochranelibrary.com/search?q=…"
+    identifier_scheme: doi
+  - name: bioRxiv / medRxiv
+    url_pattern: "https://www.biorxiv.org/search/…"
+    identifier_scheme: doi
+
+cross_domain: true
+
+seed_question: "What's the strongest evidence that magnesium glycinate
+                affects mood, and is the mechanism understood?"
+
+source_types:
+  - RCT
+  - cohort
+  - case-control
+  - animal
+  - in-vitro
+  - meta-analysis
+  - review
+```
+
+## Example 2 — ML research
+
+```yaml
+topic: "Attention mechanisms and their alternatives in large language
+        models. How architecture choices interact with training data
+        and downstream benchmark performance."
+
+concept_categories:
+  - technique          # attention variants, state-space models, MoE, …
+  - model              # GPT-4, Claude, Llama, Mamba, …
+  - benchmark          # MMLU, HumanEval, GSM8K, …
+  - phenomenon         # in-context learning, scaling laws, grokking, …
+
+subfields:
+  - architecture
+  - training-dynamics
+  - interpretability
+  - evaluation
+  - alignment
+
+primary_sources:
+  - name: arXiv
+    url_pattern: "https://arxiv.org/abs/…"
+    identifier_scheme: arxiv
+  - name: OpenReview
+    url_pattern: "https://openreview.net/forum?id=…"
+    identifier_scheme: url-hash
+  - name: Papers with Code
+    url_pattern: "https://paperswithcode.com/search?q=…"
+    identifier_scheme: arxiv
+
+cross_domain: true   # architecture papers rarely cite eval papers and vice versa
+
+seed_question: "Where do attention-based models reliably outperform
+                state-space models, and what's the explanation?"
+
+source_types:
+  - empirical study
+  - theoretical paper
+  - position paper
+  - benchmark paper
+  - blog post
+```
+
+## Example 3 — Single-discipline deep dive (history)
+
+```yaml
+topic: "The diplomatic history of the Treaty of Westphalia (1648) —
+        how it was negotiated, what it actually changed, and how
+        later historians have reinterpreted it."
+
+concept_categories:
+  - event              # individual negotiations, signings, congresses
+  - actor              # delegates, monarchs, ministers
+  - doctrine           # sovereignty, cuius regio, jus publicum
+  - place              # Münster, Osnabrück, Imperial territories
+
+subfields:
+  - early-modern-european-history
+  - international-relations
+  - religious-history
+  - legal-history
+
+primary_sources:
+  - name: Acta Pacis Westphalicae (digital edition)
+    url_pattern: "http://www.pax-westphalica.de/…"
+    identifier_scheme: url-hash
+  - name: JSTOR
+    url_pattern: "https://www.jstor.org/stable/…"
+    identifier_scheme: doi
+  - name: Internet Archive (primary docs)
+    url_pattern: "https://archive.org/details/…"
+    identifier_scheme: url-hash
+
+cross_domain: false   # a focused historical study, not an interdisciplinary probe
+
+seed_question: "How much of 'Westphalian sovereignty' was actually
+                established in 1648, and how much is a 20th-century
+                back-projection?"
+
+source_types:
+  - primary document
+  - monograph
+  - peer-reviewed article
+  - edited volume
+```
+
+---
+
+## Notes on use
+
+- `domain.md` is not immutable — R6 can suggest edits if patterns in
+  the corpus reveal that a sub-field is missing or a category is
+  miscalibrated. The operator confirms before edits land.
+- If the topic genuinely pivots (the operator changes what they're
+  researching), re-run R0 rather than patching `domain.md` piecemeal.
+- The agent should read `domain.md` at the start of every session and
+  carry it as context. It's the difference between "research assistant
+  for some topic" and "research assistant for **this** topic."
