@@ -5,20 +5,32 @@
 
 ---
 
-## Two events that make this template worth setting up properly
+## Three events that make this template worth setting up properly
 
-**April 2026.** Andrej Karpathy posted that he had largely stopped using
-LLMs to write code and started using them to organize knowledge. He
-described a three-layer system: a folder of immutable raw sources, an
-AI-maintained wiki of summaries and concept pages with backlinks
-between related ideas, and a small schema file that tells the AI how
-the wiki is supposed to be organized. His pithy version of why this
-works: *humans abandon wikis because the maintenance burden grows
-faster than the value; LLMs don't get bored, don't forget to update a
-cross-reference, and can touch fifteen files in one pass.* On a single
-topic, his wiki had grown to roughly a hundred articles and four
-hundred thousand words — past the size where the AI could answer
-non-trivial questions about the corpus with very little extra work.
+**March 2026.** Andrej Karpathy released `autoresearch` on GitHub — a
+coding agent pointed at a small ML training setup, told to read the
+training code, propose a change, run a 5-minute training job, measure
+whether the result improved, commit the change if it did, roll it back
+if it didn't, and repeat. His own two-day run produced 700 experiments
+and stacked twenty additive improvements that dropped a "Time to
+GPT-2" benchmark from 2.02 hours to 1.80. The repo crossed 66,000
+stars in a month. Fortune called the underlying methodology
+**"the Karpathy Loop."** Forks of the pattern have since landed in
+domains far from ML.
+
+**April 2026.** Karpathy posted about a parallel shift in his personal
+workflow: he had largely stopped using LLMs to write code and started
+using them to organize knowledge. He described a three-layer system: a
+folder of immutable raw sources, an AI-maintained wiki of summaries
+and concept pages with backlinks between related ideas, and a small
+schema file that tells the AI how the wiki is supposed to be
+organized. His pithy version of why this works: *humans abandon wikis
+because the maintenance burden grows faster than the value; LLMs don't
+get bored, don't forget to update a cross-reference, and can touch
+fifteen files in one pass.* On a single topic, his wiki had grown to
+roughly a hundred articles and four hundred thousand words — past the
+size where the AI could answer non-trivial questions about the corpus
+with very little extra work.
 
 **May 2026.** OpenAI announced that a general-purpose reasoning model
 had produced an original proof disproving an 80-year-old conjecture in
@@ -30,14 +42,20 @@ specific theorem; it was that *the model was not fine-tuned for math,
 not scaffolded toward this problem, and not aimed at this conjecture.*
 A general reasoning system, asked to think hard, advanced a field.
 
-Put those two events next to each other and a thesis falls out:
+Lay those three events next to each other and a thesis falls out:
 
-> The bottleneck for serious thinking is no longer "can an AI help me
-> reason about this." It's "is my knowledge structured well enough
-> that an AI can reason *with* me on it." The answer to the second
-> question is almost always no, and the reason is that knowledge bases
-> have historically been built to be read by humans, not collaborated
-> on by humans and models together.
+> The Karpathy Loop — propose, run, measure, commit-or-rollback,
+> repeat — turns out to be the same shape whether you're optimizing
+> training code or growing a knowledge base. Karpathy demonstrated it
+> twice in 2026, once in each domain. And once you have a corpus
+> structured well enough to run the loop on it, the bottleneck stops
+> being "can the AI reason about this" and starts being "is my
+> knowledge structured well enough that the AI can reason *with* me
+> on it." The answer to the second question is almost always no,
+> because knowledge bases have historically been built to be read by
+> humans, not collaborated on by humans and models together. OpenAI's
+> Erdős result showed what a general reasoner can produce when the
+> structure is right.
 
 **This template is that structure.**
 
@@ -58,7 +76,7 @@ The skeleton is three folders and three documents:
 ```
 Researcher-Brain/
 ├── AGENTS.md              ← how any AI agent should behave in here
-├── program.md             ← named routines (R0–R7) the agent runs
+├── program.md             ← named routines (R0–R8) the agent runs
 ├── domain.md              ← (produced by R0) customization for YOUR topic
 ├── raw/                   ← primary evidence, immutable, slug-addressed
 │   ├── sources/           ← published primary sources (papers, books,
@@ -92,7 +110,7 @@ images, all carrying enough provenance that you can ask the question
 that actually matters at 2 a.m.: *where did this claim come from, and
 how confident should I be?*
 
-Five design choices that earn their keep:
+Six design choices that earn their keep:
 
 **Provenance is first-class.** Every artifact in `raw/` declares its
 type, its source, and — for AI-generated investigations — the verbatim
@@ -109,6 +127,20 @@ stable slug (`doi-10.1038-s41586-023-12345`, `isbn-9780262035613`,
 move. The wiki can be reorganized freely without ever breaking a
 citation. This is the difference between "I'll fix the links later"
 and a corpus that compounds for years.
+
+**The loop is built in, not bolted on.** `R0: init` produces a
+`TODO.md` of specific research questions in your topic. `AGENTS.md`
+§10 describes the loop the agent walks: pick an item, mark it
+in-progress with the slug it will become, produce a deep-research
+artifact, land it in `raw/`, journal a one-line breadcrumb, close
+the item, and feed any follow-on questions the investigation surfaced
+back into the queue. This is the Karpathy Loop applied to knowledge
+rather than to training code — propose, research, measure whether the
+corpus is richer, commit the artifact, repeat. Concept-page synthesis
+batches weekly (§10.4) so the synthesizer can spot adjacencies across
+multiple new artifacts at once. Recurring chores graduate into
+scripts via `R8: build-wiki-tool`. The loop is what makes a research
+corpus grow without your having to push it.
 
 **The wiki is allowed to be wrong, and the audit trail proves it.**
 Routine `R6: improve-wiki` runs periodically. It re-clusters concepts,
@@ -182,10 +214,12 @@ medicine, ML, and history.
 | `R5: answer`                  | Produce an `output/<date>-<question-slug>/` deliverable with a confidence file. |
 | `R6: improve-wiki`            | Tidy. Re-cluster concepts, normalize tags, audit provenance, prune stubs.     |
 | `R7: knowledge-graph`         | Render the current concept graph; flag hubs, bridges, and isolates.           |
+| `R8: build-wiki-tool`         | When a manual chore has recurred ≥2×, turn it into a script in `scripts/`. The only routine that produces code. |
 
 \* R2 is gated on `cross_domain: true` in `domain.md`.
 
 The full procedural detail for each routine lives in `program.md`.
+The loop that consumes `TODO.md` is described in `AGENTS.md` §10.
 
 ---
 
@@ -205,11 +239,21 @@ cd MyResearchProject
 # 4. When R0 finishes, drop a few primary sources into raw/_inbox/
 #    and say: "Run R3 on the inbox."
 
-# 5. Once you have ~10 artifacts in raw/, ask the agent your first
+# 5. Open TODO.md. R0 seeded it with sections derived from your
+#    concept_categories. Add a handful of specific items if you want
+#    to steer the early corpus, or leave it and let the loop steer.
+
+# 6. Say: "Run the loop." The agent picks a queued item, produces a
+#    deep-research artifact in raw/, journals a breadcrumb, closes
+#    the item, and adds any follow-on questions the investigation
+#    surfaced back into TODO.md. This is the Karpathy Loop applied
+#    to your topic. Let it run as long as you want.
+
+# 7. Once you have ~10 artifacts in raw/, ask the agent your first
 #    real question. It runs R5 and you get an answer with citations
 #    and a confidence file.
 
-# 6. After a few weeks, ask: "Run R2." If your domain.md has
+# 8. After a few weeks, ask: "Run R2." If your domain.md has
 #    cross_domain: true, the agent walks the graph and tells you
 #    what adjacencies you've accidentally built evidence for without
 #    naming them yet.
@@ -248,24 +292,34 @@ skip the artifact file.
 ## The bet
 
 Here is the bet the design makes: in a year where a general
-reasoning model can disprove an 80-year-old Erdős conjecture, and
+reasoning model can disprove an 80-year-old Erdős conjecture, where
+the same person who taught a generation of practitioners how to
+train neural networks has now shown the same propose-run-measure
+loop works for code optimization *and* for knowledge curation, and
 where the public-facing builder community has independently
 converged on a three-layer architecture for collaborating with
-those models, the highest-leverage thing a curious person can do
-is build the corpus *their* thinking will compound on. Most people
-won't. The few who do will find that the things their corpus shows
-them are not summaries of what's known but pointers at what isn't.
+those models — the highest-leverage thing a curious person can do
+is build the corpus *their* thinking will compound on, and let the
+loop run on it.
 
-That's what this template is for.
+Most people won't. The few who do will find that the things their
+corpus shows them are not summaries of what's known but pointers at
+what isn't.
+
+That's what this template is for. If you have questions or want to help improve the work feel free to submit a PR or contact me at virion.ai/initiate
 
 ---
 
 ## Credits and influence
 
-- **Andrej Karpathy** — the April 2026 second-brain post that crystallized
-  the three-layer pattern for many of us, and the
-  *"LLMs don't get bored"* observation that justifies AI-maintained wikis
-  in the first place.
+- **Andrej Karpathy** — twice over. The March 2026 `autoresearch`
+  release showed that a coding agent in a tight loop can produce
+  real, stacking improvements; Fortune called the methodology
+  **"the Karpathy Loop."** The April 2026 second-brain post
+  crystallized the three-layer pattern for AI-maintained wikis and
+  contributed the *"LLMs don't get bored"* observation that
+  justifies them in the first place. This template combines both —
+  Karpathy's loop applied to Karpathy's three layers.
 - **OpenAI** — the May 2026 unit-distance / Erdős announcement that
   proved a general reasoning model, given the right structure, can
   contribute novel knowledge rather than merely retrieve it.
@@ -283,9 +337,22 @@ That's what this template is for.
 
 ## Sources
 
-- [OpenAI: Model disproves a discrete geometry conjecture (May 2026)](https://openai.com/index/model-disproves-discrete-geometry-conjecture/)
-- [TechCrunch: OpenAI claims it solved an 80-year-old math problem — for real this time](https://techcrunch.com/2026/05/20/openai-claims-it-solved-an-80-year-old-math-problem-for-real-this-time/)
-- [Scientific American: AI just solved an 80-year-old Erdős problem and mathematicians are amazed](https://www.scientificamerican.com/article/ai-just-solved-an-80-year-old-erdos-problem-and-mathematicians-are-amazed/)
+**Karpathy's `autoresearch` (March 2026)**
+
+- [karpathy/autoresearch on GitHub](https://github.com/karpathy/autoresearch)
+- [VentureBeat: Karpathy's new open source autoresearch lets you run hundreds of AI experiments a night](https://venturebeat.com/technology/andrej-karpathys-new-open-source-autoresearch-lets-you-run-hundreds-of-ai)
+- [Fortune: Why everyone is talking about Karpathy's autonomous AI research agent ("The Karpathy Loop")](https://fortune.com/2026/03/17/andrej-karpathy-loop-autonomous-ai-agents-future/)
+- [Shopify Engineering: Autoresearch isn't just for training models](https://shopify.engineering/autoresearch)
+- [DataCamp: A Guide to Karpathy's AutoResearch](https://www.datacamp.com/tutorial/guide-to-autoresearch)
+
+**Karpathy's second-brain pattern (April 2026)**
+
 - [Karpathy's instructions for building an AI-driven second brain (Techstrong.ai)](https://techstrong.ai/features/karpathys-instructions-for-building-an-ai-driven-second-brain/)
 - [Andrej Karpathy's LLM Wiki: Build a Self-Updating AI Second Brain with Obsidian in 1 Hour (MindStudio)](https://www.mindstudio.ai/blog/andrej-karpathy-llm-wiki-obsidian-ai-second-brain)
 - [The Complete Guide to Karpathy's Second Brain (aibyaakash)](https://www.aibyaakash.com/p/karpathy-second-brain)
+
+**OpenAI's Erdős unit-distance result (May 2026)**
+
+- [OpenAI: Model disproves a discrete geometry conjecture](https://openai.com/index/model-disproves-discrete-geometry-conjecture/)
+- [TechCrunch: OpenAI claims it solved an 80-year-old math problem — for real this time](https://techcrunch.com/2026/05/20/openai-claims-it-solved-an-80-year-old-math-problem-for-real-this-time/)
+- [Scientific American: AI just solved an 80-year-old Erdős problem and mathematicians are amazed](https://www.scientificamerican.com/article/ai-just-solved-an-80-year-old-erdos-problem-and-mathematicians-are-amazed/)
