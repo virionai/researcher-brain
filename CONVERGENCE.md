@@ -6,6 +6,7 @@
 In three months of 2026, three events landed in three different domains —
 autonomous ML research, personal knowledge management, and pure mathematics.
 Laid side by side, they describe the same shape. This is that story.
+<a href="./images/researcher=brain.img"><img src="https://github.com/virionai/researcher-brain/blob/main/images/convergence.png?raw=true" alt="a trio of knowledge"></a>
 
 ---
 
