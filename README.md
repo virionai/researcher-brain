@@ -1,7 +1,7 @@
 <div align="center">
 
 <h1>Researcher-Brain</h1>
-<a href="./images/researcher=brain.img"><img src="https://github.com/virionai/researcher-brain/images/researcher-brain.png" alt="The Brain turning chaos to organization"></a>
+<a href="./images/researcher=brain.img"><img src="https://github.com/virionai/researcher-brain/blob/main/images/researcher-brain.png?raw=true" alt="The Brain turning chaos to organization"></a>
 <p><em>A second brain for research — built for the era when AI doesn't just <strong>retrieve</strong> knowledge, it <strong>produces</strong> it.</em></p>
 
 <p>
