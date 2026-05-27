@@ -216,6 +216,7 @@ started returning more than it cost to maintain.
 | `R6: improve-wiki`         | Tidy. Re-cluster concepts, normalize tags, audit provenance, prune stubs.                                       |
 | `R7: knowledge-graph`      | Render the current concept graph; flag hubs, bridges, and isolates.                                             |
 | `R8: build-wiki-tool`      | When a manual chore has recurred ≥2×, turn it into a script in `scripts/`. The only routine that produces code. |
+| `R9: consolidate-todo`     | Close `TODO.md` items already covered by `raw/`; cluster similar items into batched targets. Designed to run daily. |
 
 \* R2 is gated on `cross_domain: true` in `domain.md`.
 
